@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StarLauncher</string>
+    <string name="search_apps">Search apps...</string>
+    <string name="add_favorite">Add Favorite</string>
+    <string name="settings">Settings</string>
+    <string name="set_wallpaper">Set Wallpaper</string>
+    <string name="manage_favorites">Manage Favorites</string>
+    <string name="permission_required">Permission required to set wallpaper</string>
+</resources>
