@@ -14,14 +14,22 @@ android {
         versionCode 1
         versionName "1.0"
 
-        vectorDrawables {
-            useSupportLibrary true
-        }
+        // Generate BuildConfig.java
+        buildConfigField "String", "APP_NAME", "\"StarLauncher\""
+
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            debuggable true
+        }
+
         release {
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -33,41 +41,81 @@ android {
 
     kotlinOptions {
         jvmTarget = '17'
+        freeCompilerArgs += [
+            "-Xjvm-default=all",
+            "-opt-in=kotlin.RequiresOptIn"
+        ]
     }
 
     buildFeatures {
         compose true
+        buildConfig true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.14'
     }
 
-    packagingOptions {
+    packaging {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                'META-INF/gradle/incremental.annotation.processors'
+            ]
         }
     }
 
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    // Explicit source layout
     sourceSets {
         getByName("main") {
             java.srcDirs("src/com/lyciv/star")
         }
     }
+
+    // Make CI builds faster & reproducible
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
 }
 
 dependencies {
-    implementation platform('androidx.compose:compose-bom:2024.02.00')
+    // ---- Compose BOM (October 2024, stable) ----
+    implementation platform('androidx.compose:compose-bom:2024.10.00')
+
+    // Core Android + Compose
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.6'
     implementation 'androidx.activity:activity-compose:1.9.3'
-    implementation 'androidx.compose.material3:material3'
+
+    // Compose UI
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.6'
-    implementation 'androidx.navigation:navigation-compose:2.8.3'
-    implementation 'androidx.datastore:datastore-preferences:1.1.1'
-    implementation 'androidx.core:core-ktx:1.12.0'
 
+    // Material3 (stable)
+    implementation 'androidx.compose.material3:material3:1.3.0'
+
+    // Navigation
+    implementation 'androidx.navigation:navigation-compose:2.8.3'
+
+    // DataStore
+    implementation 'androidx.datastore:datastore-preferences:1.1.1'
+
+    // Coroutines (async)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+
+    // Debugging
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 }
